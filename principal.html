@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Nexorf Hosting - Red Neon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Rajdhani:wght@600;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --color-primary: #ff073a;
+            --color-text: #ffffff;
+            --color-muted: #ffccd5;
+            --card-bg: rgba(0, 0, 0, 0.75); /* Fondo más elegante */
+            --card-border: rgba(255, 7, 58, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Animación de fondo fluido */
+        @keyframes fluirFondo {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Animación de Entrada Suave */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        body {
+            font-family: 'Inter', sans-serif; /* Fuente limpia para lectura */
+            color: var(--color-text);
+            line-height: 1.6;
+            background: linear-gradient(-60deg, #b00000, #000000, #8a0000);
+            background-size: 400% 400%;
+            animation: fluirFondo 10s ease infinite;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        section { padding: 5rem 0; }
+
+        /* TÍTULOS CON FUENTE FUTURISTA */
+        h1, h2, h3, h4 {
+            font-family: 'Rajdhani', sans-serif;
+            text-transform: uppercase;
+        }
+
+        /* ESTILOS DE TEXTO NEÓN */
+        .neon-title {
+            color: #ffffff;
+            font-weight: 900;
+            line-height: 1.1;
+            /* Efecto neón en el texto */
+            text-shadow: 0 0 10px rgba(255,7,58,0.6);
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            transform: translateZ(0);
+        }
+
+        h1.neon-title {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* EL NOMBRE "NEXORF" GRANDE */
+        .brand-name {
+            font-family: 'Rajdhani', sans-serif;
+            width: 100%;
+            text-align: center;
+            font-size: 5rem;
+            font-weight: 900;
+            color: #ffffff;
+            margin-top: 15px;
+            letter-spacing: 6px;
+            line-height: 1;
+
+            /* Borde y Brillo Rojo Intenso */
+            -webkit-text-stroke: 2px var(--color-primary);
+            text-stroke: 2px var(--color-primary);
+            text-shadow:
+                    0 0 10px rgba(255,7,58,0.8),
+                    0 0 30px rgba(255,7,58,0.4);
+
+            /* Animación de entrada */
+            animation: fadeInUp 1s ease-out forwards;
+        }
+
+        @media (min-width: 768px) {
+            h1.neon-title { font-size: 5.5rem; }
+            .brand-name { font-size: 7.5rem; }
+        }
+
+        h2.neon-title {
+            margin-bottom: 3rem;
+            font-size: 3rem;
+            border-bottom: 2px solid var(--color-primary); /* Línea decorativa debajo */
+            padding-bottom: 0.5rem;
+        }
+
+        .hero {
+            min-height: 85vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .hero p {
+            font-size: 1.35rem;
+            max-width: 800px;
+            margin: 0 auto 2.5rem auto;
+            color: var(--color-muted);
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 0.3s forwards; /* Delay para que salga después */
+        }
+
+        .btn-group {
+            display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 0.6s forwards;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            border-radius: 50px; /* Botones más redondos y modernos */
+            font-weight: 700;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: white;
+            box-shadow: 0 4px 20px rgba(255, 7, 58, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(255, 7, 58, 0.7);
+        }
+
+        .btn-outline {
+            border: 2px solid var(--color-primary);
+            color: white;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(255, 7, 58, 0.2);
+            box-shadow: 0 0 15px rgba(255, 7, 58, 0.3);
+        }
+
+        .grid-servicios {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 2.5rem;
+            border-radius: 20px;
+            backdrop-filter: blur(12px);
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+
+            /* Animación de entrada al hacer scroll (simple) */
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out forwards;
+            animation-delay: 0.2s; /* Un pequeño retraso genérico */
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            border-color: var(--color-primary);
+            box-shadow: 0 10px 40px -10px rgba(255, 7, 58, 0.3);
+            background: rgba(40, 0, 0, 0.7);
+        }
+
+        .card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: white;
+            font-weight: 700;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .card p { color: var(--color-muted); font-size: 1rem; }
+
+        /* ICONOS SVG PARA SERVICIOS */
+        .svc-icon {
+            width: 32px;
+            height: 32px;
+            stroke: var(--color-primary);
+            stroke-width: 2;
+            fill: none;
+            filter: drop-shadow(0 0 5px var(--color-primary));
+        }
+
+        .arch-box {
+            background: linear-gradient(145deg, rgba(20, 0, 0, 0.8), rgba(0, 0, 0, 0.5));
+            border: 1px solid var(--card-border);
+            padding: 3rem;
+            border-radius: 24px;
+            text-align: left;
+            font-size: 1.1rem;
+            backdrop-filter: blur(10px);
+
+            opacity: 0;
+            animation: fadeInUp 1s ease-out forwards;
+        }
+
+        .arch-list { list-style: none; }
+
+        .arch-list li {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+            position: relative;
+            color: var(--color-muted);
+            display: flex;
+            align-items: center;
+        }
+
+        .arch-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 8px;
+            height: 8px;
+            background: var(--color-primary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--color-primary);
+        }
+
+        strong { color: #fff; font-weight: 700; }
+
+        /* FOOTER PREMIUM */
+        footer {
+            background: rgba(5, 0, 0, 0.95);
+            padding: 4rem 1.5rem 2rem;
+            margin-top: auto;
+            border-top: 1px solid var(--card-border);
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 4rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-section h4 {
+            color: var(--color-primary);
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(255,7,58,0.4);
+        }
+
+        .footer-section p {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 0.8rem;
+            color: var(--color-muted);
+        }
+
+        .footer-icon {
+            width: 18px;
+            height: 18px;
+            stroke: var(--color-primary);
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .footer-section a {
+            color: var(--color-muted);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: var(--color-primary);
+            text-shadow: 0 0 8px var(--color-primary);
+        }
+
+        .footer-bottom {
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 7, 58, 0.15);
+            font-size: 0.9rem;
+            opacity: 0.6;
+        }
+
+        /* LOGO ANIMADO */
+        .logo-main {
+            height: 4em; /* REDUCIDO: de 5em a 4em */
+            width: auto;
+            vertical-align: middle;
+            filter: drop-shadow(0 0 20px rgba(255,7,58,0.5));
+            transition: transform 0.3s ease;
+
+            /* Animación de flotación suave */
+            animation: flotarLogo 4s ease-in-out infinite;
+        }
+
+        .logo-main:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 35px rgba(255,7,58,0.8));
+        }
+
+        @keyframes flotarLogo {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .icon-arch-title {
+            width: 40px;
+            height: 40px;
+            fill: none;
+            stroke: #fff;
+            stroke-width: 2;
+            margin-right: 15px;
+            filter: drop-shadow(0 0 5px var(--color-primary));
+        }
+    </style>
+</head>
+
+<body>
+
+<section class="hero">
+    <div class="container">
+        <h1 class="neon-title">
+            <img src="./img/nexorf_1.png" alt="Logo Nexorf" class="logo-main">
+            <div class="brand-name">NEXORF</div>
+        </h1>
+        <p>
+            Plataforma de <span style="color:#fff; font-weight:600; text-shadow:0 0 10px rgba(255,255,255,0.3);">hosting interno dinámico</span>,
+            gestionando servicios web, DNS y bases de datos con máxima eficiencia.
+        </p>
+        <div class="btn-group">
+            <a href="#servicios" class="btn btn-primary">Ver servicios</a>
+            <a href="#arquitectura" class="btn btn-outline">Arquitectura</a>
+        </div>
+    </div>
+</section>
+
+<section id="servicios">
+    <div class="container">
+        <div style="text-align: left;">
+            <h2 class="neon-title">🔧 Servicios Activos</h2>
+        </div>
+        <div class="grid-servicios">
+            <div class="card" style="animation-delay: 0.1s;">
+                <h3>
+                    <svg class="svc-icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                    Hosting Web
+                </h3>
+                <p>
+                    Infraestructura robusta basada en <strong>Nginx y PHP-FPM</strong>.
+                    Optimizado para servir sitios estáticos y dinámicos con tiempos de carga mínimos,
+                    soporte para Virtual Hosts y configuración lista para SSL/TLS.
+                </p>
+            </div>
+            <div class="card" style="animation-delay: 0.2s;">
+                <h3>
+                    <svg class="svc-icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                    FTP Seguro
+                </h3>
+                <p>
+                    Servidor de transferencia de archivos <strong>vsftpd</strong> con encriptación FTPS explícita.
+                    Garantiza el aislamiento de usuarios (chroot) para que cada cliente gestione sus
+                    directorios de forma privada y protegida.
+                </p>
+            </div>
+            <div class="card" style="animation-delay: 0.3s;">
+                <h3>
+                    <svg class="svc-icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6" y2="6"></line><line x1="6" y1="18" x2="6" y2="18"></line></svg>
+                    DNS Interno
+                </h3>
+                <p>
+                    Resolución de nombres ultrarrápida mediante <strong>BIND9</strong>.
+                    Configurado con zonas directas e inversas para gestionar el tráfico de la red local,
+                    reduciendo la latencia y eliminando la dependencia de DNS externos.
+                </p>
+            </div>
+            <div class="card" style="animation-delay: 0.4s;">
+                <h3>
+                    <svg class="svc-icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+                    Base de Datos
+                </h3>
+                <p>
+                    Motor <strong>MariaDB</strong> ajustado para alta concurrencia y transacciones ACID.
+                    Ofrece integridad de datos total y una conexión nativa optimizada para aplicaciones
+                    web modernas y sistemas de gestión (CMS).
+                </p>
+            </div>
+            <div class="card" style="animation-delay: 0.5s;">
+                <h3>
+                    <svg class="svc-icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                    Docker
+                </h3>
+                <p>
+                    Arquitectura basada en contenedores para un <strong>aislamiento total</strong> de servicios.
+                    Permite desplegar aplicaciones en entornos controlados, asegurando que un fallo en un servicio
+                    no afecte al resto del sistema.
+                </p>
+            </div>
+            <div class="card" style="animation-delay: 0.6s;">
+                <h3>
+                    <svg class="svc-icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    Panel Admin
+                </h3>
+                <p>
+                    Interfaz gráfica centralizada para la <strong>gestión integral</strong> del servidor.
+                    Monitorea el consumo de CPU/RAM en tiempo real, administra usuarios y revisa los logs
+                    del sistema de forma visual e intuitiva.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="arquitectura">
+    <div class="container">
+        <h2 class="neon-title" style="text-align: left; justify-content: flex-start;">
+            <svg class="icon-arch-title" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+            Arquitectura
+        </h2>
+
+        <div class="arch-box">
+            <ul class="arch-list">
+                <li><strong>Nginx:</strong> Servidor Web / Proxy Inverso.</li>
+                <li><strong>PHP-FPM:</strong> Procesamiento de Backend.</li>
+                <li><strong>MariaDB:</strong> Motor SQL.</li>
+                <li><strong>vsftpd:</strong> Servidor FTP.</li>
+                <li><strong>BIND9:</strong> Servidor de Nombres.</li>
+                <li><strong>Docker:</strong> Infraestructura.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-section">
+            <h4>Contacto y Soporte</h4>
+            <p>
+                <svg class="footer-icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                <a href="mailto:soporte@nexorf.com">soporte@nexorf.com</a>
+            </p>
+            <p>
+                <svg class="footer-icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                +34 900 123 456
+            </p>
+        </div>
+        <div class="footer-section">
+            <h4>Información General</h4>
+            <p>
+                <svg class="footer-icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                <a href="mailto:info@nexorf.com">info@nexorf.com</a>
+            </p>
+            <p>
+                <svg class="footer-icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                <a href="http://www.nexorf.com" target="_blank">www.nexorf.com</a>
+            </p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2026 <strong>Nexorf Hosting</strong> • Plataforma educativa • Offline Mode</p>
+    </div>
+</footer>
+
+</body>
+</html>
