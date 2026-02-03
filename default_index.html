@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Nexorf - Cuenta Creada</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    :root {
+      /* PALETA NEURAL NEXUS (Cyan) */
+      --neon-blue: #00d9ff;
+      --bg-dark: #020205;
+      --text-main: #ffffff;
+      --text-muted: #aaddff;
+      --glass-bg: rgba(2, 10, 20, 0.7);
+      --glass-border: rgba(0, 217, 255, 0.3);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    /* CANVAS FONDO */
+    #neural-canvas {
+      position: fixed; top: 0; left: 0; z-index: -1;
+    }
+
+    /* ANIMACIÓN DE ENTRADA */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .content-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 40px 20px;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* TARJETA GLASS */
+    .card {
+      width: 100%;
+      max-width: 600px;
+      padding: 3rem;
+      background: var(--glass-bg);
+      backdrop-filter: blur(15px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      box-shadow: 0 0 50px rgba(0, 217, 255, 0.1);
+      text-align: center;
+      position: relative;
+      animation: fadeInUp 0.8s ease-out forwards;
+    }
+
+    /* LOGO CON FILTRO CIAN */
+    .logo-main {
+      max-width: 80%;
+      height: auto;
+      max-height: 100px;
+      vertical-align: middle;
+      margin-bottom: 2.5rem;
+      /* Convierte rojo a cian y añade brillo */
+      filter: hue-rotate(180deg) drop-shadow(0 0 20px var(--neon-blue));
+      animation: floatLogo 4s ease-in-out infinite;
+    }
+    @keyframes floatLogo { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+    /* MENSAJE DE ÉXITO */
+    .success-message {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 2.5rem;
+      text-align: center;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(0, 217, 255, 0.2);
+    }
+
+    .success-message span {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
+    }
+
+    .icon-check {
+      width: 36px;
+      height: 36px;
+      stroke: var(--neon-blue);
+      stroke-width: 3;
+      fill: none;
+      flex-shrink: 0;
+      filter: drop-shadow(0 0 8px var(--neon-blue));
+    }
+
+    /* CAJA DE INFO TÉCNICA */
+    .info-box {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(0, 217, 255, 0.15);
+      border-left: 3px solid var(--neon-blue);
+      border-radius: 10px;
+      padding: 2rem;
+      text-align: left;
+      margin-bottom: 2rem;
+    }
+
+    .info-item {
+      margin-bottom: 1.5rem;
+      font-size: 1.05rem;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      color: var(--text-muted);
+    }
+    .info-item:last-child { margin-bottom: 0; }
+
+    /* ICONOS */
+    .icon-svg {
+      width: 24px;
+      height: 24px;
+      stroke: var(--neon-blue);
+      stroke-width: 2;
+      fill: none;
+      flex-shrink: 0;
+      filter: drop-shadow(0 0 5px var(--neon-blue));
+    }
+
+    .label {
+      font-weight: 700;
+      color: #fff;
+      margin-right: 5px;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+    }
+
+    code {
+      background: rgba(0, 217, 255, 0.1);
+      border: 1px solid rgba(0, 217, 255, 0.3);
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      font-family: 'Consolas', monospace;
+      font-weight: bold;
+      color: var(--neon-blue);
+      letter-spacing: 0.5px;
+    }
+
+    /* FOOTER */
+    footer {
+      width: 100%;
+      background: #00050a;
+      padding: 3rem 1.5rem 1rem;
+      border-top: 1px solid rgba(0, 217, 255, 0.2);
+      text-align: center;
+      margin-top: auto;
+      position: relative;
+      z-index: 10;
+    }
+
+    .footer-content {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 3rem;
+      margin-bottom: 2rem;
+    }
+
+    .footer-section h4 {
+      color: var(--neon-blue);
+      font-size: 1.1rem;
+      margin-bottom: 1.2rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: 700;
+    }
+
+    .footer-section p {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.8rem;
+      margin-bottom: 0.6rem;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .footer-section a {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .footer-section a:hover { color: var(--neon-blue); text-shadow: 0 0 8px var(--neon-blue); }
+
+    .footer-bottom {
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(0, 217, 255, 0.1);
+      font-size: 0.85rem;
+      color: #556677;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="neural-canvas"></canvas>
+
+<div class="content-wrapper">
+  <div class="card">
+    <img src="./img/nexorf_1.png" alt="Logo Nexorf" class="logo-main">
+
+    <div class="success-message">
+      <svg class="icon-check" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+      <span>Cuenta Creada Correctamente</span>
+    </div>
+
+    <div class="info-box">
+      <div class="info-item">
+        <svg class="icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <span><span class="label">Directorio web:</span> <code>/public_html</code></span>
+      </div>
+
+      <div class="info-item">
+        <svg class="icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="2" y1="12" x2="22" y2="12"></line>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
+        <span><span class="label">Acceso web:</span> dominio asignado</span>
+      </div>
+
+      <div class="info-item">
+        <svg class="icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="17 8 12 3 7 8"></polyline>
+          <line x1="12" y1="3" x2="12" y2="15"></line>
+        </svg>
+        <span><span class="label">Sube archivos</span> vía FTP</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-content">
+    <div class="footer-section">
+      <h4>Contacto y Soporte</h4>
+      <p>
+        <svg class="icon-svg" style="width:16px; height:16px;" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+        <a href="mailto:soporte@nexorf.com">soporte@nexorf.com</a>
+      </p>
+      <p>
+        <svg class="icon-svg" style="width:16px; height:16px;" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+        +34 900 123 456
+      </p>
+    </div>
+    <div class="footer-section">
+      <h4>Información General</h4>
+      <p>
+        <svg class="icon-svg" style="width:16px; height:16px;" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+        <a href="mailto:info@nexorf.com">info@nexorf.com</a>
+      </p>
+      <p>
+        <svg class="icon-svg" style="width:16px; height:16px;" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+        <a href="http://www.nexorf.com" target="_blank">www.nexorf.com</a>
+      </p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 <strong>Nexorf Hosting</strong> | Plataforma Educativa | Estado: OFFLINE</p>
+  </div>
+</footer>
+
+<script>
+  const canvas = document.getElementById('neural-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  let particles = [];
+  const particleCount = 100; // Número de nodos
+
+  // Objeto para el mouse
+  let mouse = { x: null, y: null, radius: 150 };
+
+  window.addEventListener('mousemove', (event) => {
+    mouse.x = event.x;
+    mouse.y = event.y;
+  });
+
+  class Particle {
+    constructor() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.vx = (Math.random() - 0.5) * 1.0;
+      this.vy = (Math.random() - 0.5) * 1.0;
+      this.size = Math.random() * 2 + 1;
+    }
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+
+      if(this.x < 0 || this.x > canvas.width) this.vx *= -1;
+      if(this.y < 0 || this.y > canvas.height) this.vy *= -1;
+
+      // Interacción: las partículas huyen suavemente del mouse
+      let dx = mouse.x - this.x;
+      let dy = mouse.y - this.y;
+      let distance = Math.sqrt(dx*dx + dy*dy);
+      if (distance < mouse.radius) {
+        if (mouse.x < this.x && this.x < canvas.width - 10) this.x += 1;
+        if (mouse.x > this.x && this.x > 10) this.x -= 1;
+        if (mouse.y < this.y && this.y < canvas.height - 10) this.y += 1;
+        if (mouse.y > this.y && this.y > 10) this.y -= 1;
+      }
+    }
+    draw() {
+      ctx.fillStyle = '#00d9ff';
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function init() {
+    particles = [];
+    for(let i=0; i<particleCount; i++) particles.push(new Particle());
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for(let i=0; i<particles.length; i++) {
+      particles[i].update();
+      particles[i].draw();
+      for(let j=i; j<particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const distance = Math.sqrt(dx*dx + dy*dy);
+        if(distance < 130) {
+          ctx.strokeStyle = `rgba(0, 217, 255, ${1 - distance/130})`;
+          ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(animate);
+  }
+
+  init();
+  animate();
+
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    init();
+  });
+
+  window.addEventListener('mouseout', () => {
+    mouse.x = undefined;
+    mouse.y = undefined;
+  });
+</script>
+
+</body>
+</html>
