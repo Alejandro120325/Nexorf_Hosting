@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Nexorf - Admin System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    :root {
+      /* PALETA NEURAL (Cyan) */
+      --neon-blue: #00d9ff;
+      --bg-dark: #020205;
+      --text-main: #ffffff;
+      --glass-bg: rgba(2, 10, 20, 0.7);
+      --glass-border: rgba(0, 217, 255, 0.3);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden; /* Importante para el canvas */
+    }
+
+    /* CANVAS FONDO */
+    #neural-canvas {
+      position: fixed; top: 0; left: 0; z-index: -1;
+    }
+
+    /* TARJETA FORMULARIO (Glassmorphism) */
+    .card {
+      width: 100%;
+      max-width: 450px;
+      padding: 3.5rem 2.5rem;
+      background: var(--glass-bg);
+      backdrop-filter: blur(15px);
+      border: 1px solid var(--glass-border);
+      border-radius: 25px;
+      box-shadow: 0 0 50px rgba(0, 217, 255, 0.1);
+      text-align: center;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* LOGO CON FILTRO CIAN */
+    .logo-header {
+      height: 80px;
+      margin-bottom: 1.5rem;
+      /* Convierte rojo a cian y añade brillo */
+      filter: hue-rotate(180deg) drop-shadow(0 0 20px var(--neon-blue));
+      animation: floatLogo 4s ease-in-out infinite;
+    }
+    @keyframes floatLogo { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+    h1 {
+      font-size: 2rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 2.5rem;
+      background: linear-gradient(to right, #fff, var(--neon-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 800;
+    }
+
+    /* FORMULARIOS ESTILO NEURAL */
+    label {
+      display: block;
+      text-align: left;
+      font-size: 0.9rem;
+      color: var(--neon-blue);
+      margin-bottom: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-left: 15px; /* Alineado con el input redondeado */
+    }
+
+    input {
+      width: 100%;
+      padding: 15px 25px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(0, 217, 255, 0.3);
+      color: #fff;
+      border-radius: 50px; /* Redondeado estilo cápsula */
+      outline: none;
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 1rem;
+      margin-bottom: 2.5rem;
+      transition: 0.3s;
+    }
+
+    input:focus {
+      border-color: var(--neon-blue);
+      box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
+      background: rgba(0, 217, 255, 0.05);
+    }
+
+    /* BOTÓN NEURAL */
+    button {
+      width: 100%;
+      padding: 16px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      border: 1px solid var(--neon-blue);
+      color: var(--neon-blue);
+      background: rgba(0, 217, 255, 0.05);
+      border-radius: 50px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 1rem;
+    }
+
+    button:hover {
+      background: var(--neon-blue);
+      color: #000;
+      box-shadow: 0 0 30px var(--neon-blue);
+      transform: translateY(-2px);
+    }
+
+  </style>
+</head>
+<body>
+
+<canvas id="neural-canvas"></canvas>
+
+<form method="POST" class="card">
+  <img src="./img/nexorf_1.png" alt="Nexorf" class="logo-header">
+
+  <h1>PANEL NEXORF</h1>
+
+  <label>USUARIO DEL SISTEMA</label>
+  <input
+          name="user"
+          required
+          placeholder="Ingrese nombre de usuario..."
+          autocomplete="off"
+  />
+
+  <button type="submit">
+    Inicializar Hosting
+  </button>
+
+</form>
+
+<script>
+  const canvas = document.getElementById('neural-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  let particles = [];
+  const particleCount = 100;
+
+  let mouse = { x: null, y: null, radius: 150 };
+
+  window.addEventListener('mousemove', (event) => {
+    mouse.x = event.x;
+    mouse.y = event.y;
+  });
+
+  class Particle {
+    constructor() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.vx = (Math.random() - 0.5) * 1.0;
+      this.vy = (Math.random() - 0.5) * 1.0;
+      this.size = Math.random() * 2 + 1;
+    }
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+
+      if(this.x < 0 || this.x > canvas.width) this.vx *= -1;
+      if(this.y < 0 || this.y > canvas.height) this.vy *= -1;
+
+      let dx = mouse.x - this.x;
+      let dy = mouse.y - this.y;
+      let distance = Math.sqrt(dx*dx + dy*dy);
+      if (distance < mouse.radius) {
+        if (mouse.x < this.x && this.x < canvas.width - 10) this.x += 1;
+        if (mouse.x > this.x && this.x > 10) this.x -= 1;
+        if (mouse.y < this.y && this.y < canvas.height - 10) this.y += 1;
+        if (mouse.y > this.y && this.y > 10) this.y -= 1;
+      }
+    }
+    draw() {
+      ctx.fillStyle = '#00d9ff';
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function init() {
+    particles = [];
+    for(let i=0; i<particleCount; i++) particles.push(new Particle());
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for(let i=0; i<particles.length; i++) {
+      particles[i].update();
+      particles[i].draw();
+      for(let j=i; j<particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const distance = Math.sqrt(dx*dx + dy*dy);
+        if(distance < 130) {
+          ctx.strokeStyle = `rgba(0, 217, 255, ${1 - distance/130})`;
+          ctx.lineWidth = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(animate);
+  }
+
+  init();
+  animate();
+
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    init();
+  });
+
+  window.addEventListener('mouseout', () => {
+    mouse.x = undefined;
+    mouse.y = undefined;
+  });
+</script>
+
+</body>
+</html>
