@@ -1,0 +1,285 @@
+const express = require("express");
+const { exec } = require("child_process");
+const crypto = require("crypto");
+const path = require("path");
+
+const app = express();
+app.use(express.urlencoded({ extended: true }));
+
+// Servir archivos estáticos (para el logo en /img)
+app.use("/static", express.static(path.join(__dirname)));
+
+// --- CSS Y SCRIPT COMPARTIDOS (DISEÑO NEURAL NEXUS) ---
+const commonResources = `
+<style>
+    :root {
+        /* PALETA NEURAL (Cyan) */
+        --neon-blue: #00d9ff;
+        --bg-dark: #020205;
+        --text-main: #ffffff;
+        --glass-bg: rgba(2, 10, 20, 0.7);
+        --glass-border: rgba(0, 217, 255, 0.3);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        margin: 0; overflow-x: hidden;
+        font-family: 'Segoe UI', sans-serif;
+        background-color: var(--bg-dark);
+        color: var(--text-main);
+        min-height: 100vh;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+    }
+    /* CANVAS FONDO */
+    #neural-canvas { position: fixed; top: 0; left: 0; z-index: -1; }
+
+    /* TARJETA GLASS */
+    .card {
+        background: var(--glass-bg); backdrop-filter: blur(15px);
+        border: 1px solid var(--glass-border); border-radius: 20px;
+        box-shadow: 0 0 50px rgba(0, 217, 255, 0.1);
+        text-align: center; position: relative; padding: 3rem;
+        width: 100%; max-width: 500px;
+        animation: fadeInUp 0.8s ease-out forwards;
+    }
+    .card.wide { max-width: 900px; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    h1 {
+        font-size: 2rem; font-weight: 800; margin-bottom: 2rem;
+        background: linear-gradient(to right, #fff, var(--neon-blue));
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        text-transform: uppercase; letter-spacing: 2px;
+    }
+
+    .logo-header {
+        height: 80px; margin-bottom: 1.5rem;
+        filter: hue-rotate(180deg) drop-shadow(0 0 20px var(--neon-blue));
+        animation: floatLogo 4s ease-in-out infinite;
+    }
+    @keyframes floatLogo { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+    /* FORMULARIOS */
+    label {
+        display: block; text-align: left; font-size: 0.9rem; color: var(--neon-blue);
+        margin-bottom: 0.5rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+        margin-left: 15px;
+    }
+    input {
+        width: 100%; padding: 15px 25px; background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(0, 217, 255, 0.3); color: #fff;
+        border-radius: 50px; outline: none; font-size: 1rem; margin-bottom: 2rem; transition: 0.3s;
+    }
+    input:focus { border-color: var(--neon-blue); box-shadow: 0 0 20px rgba(0, 217, 255, 0.2); }
+
+    /* BOTONES */
+    button, .btn {
+        width: 100%; padding: 16px; font-weight: bold; text-transform: uppercase;
+        letter-spacing: 2px; border: 1px solid var(--neon-blue); color: var(--neon-blue);
+        background: rgba(0, 217, 255, 0.05); border-radius: 50px; cursor: pointer;
+        transition: 0.3s; font-size: 1rem; display: inline-block; text-decoration: none;
+        text-align: center;
+    }
+    button:hover, .btn:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 30px var(--neon-blue); transform: translateY(-2px); }
+
+    /* GRID DE RESULTADOS */
+    .data-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; text-align: left; }
+    .data-item {
+        background: rgba(0, 20, 40, 0.6); padding: 1.2rem;
+        border-left: 4px solid var(--neon-blue); border-radius: 0 10px 10px 0;
+        display: flex; align-items: center; gap: 15px; transition: 0.3s;
+    }
+    .data-item:hover { background: rgba(0, 217, 255, 0.1); transform: translateX(5px); }
+    .data-label { font-size: 0.75rem; text-transform: uppercase; color: var(--neon-blue); font-weight: 700; display: block; }
+    .data-value { font-family: 'Consolas', monospace; font-size: 1.05rem; color: #fff; font-weight: 600; word-break: break-all; }
+
+    .terminal-log {
+        background: #050a10; border: 1px solid rgba(0, 217, 255, 0.2); border-radius: 10px;
+        margin-bottom: 2rem; font-family: 'Consolas', monospace; font-size: 0.9rem; color: #00ff88;
+        padding: 1.5rem; max-height: 200px; overflow-y: auto; text-align: left; white-space: pre-wrap;
+    }
+</style>
+
+<script>
+    window.onload = function() {
+        const canvas = document.getElementById('neural-canvas');
+        if(!canvas) return;
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particles = [];
+        const particleCount = 100;
+        let mouse = { x: null, y: null, radius: 150 };
+
+        window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; });
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 1;
+                this.vy = (Math.random() - 0.5) * 1;
+                this.size = Math.random() * 2 + 1;
+            }
+            update() {
+                this.x += this.vx; this.y += this.vy;
+                if(this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if(this.y < 0 || this.y > canvas.height) this.vy *= -1;
+
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx*dx + dy*dy);
+                if (distance < mouse.radius) {
+                    if (mouse.x < this.x && this.x < canvas.width - 10) this.x += 1;
+                    if (mouse.x > this.x && this.x > 10) this.x -= 1;
+                    if (mouse.y < this.y && this.y < canvas.height - 10) this.y += 1;
+                    if (mouse.y > this.y && this.y > 10) this.y -= 1;
+                }
+            }
+            draw() {
+                ctx.fillStyle = '#00d9ff';
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+            }
+        }
+
+        for(let i=0; i<particleCount; i++) particles.push(new Particle());
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for(let i=0; i<particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                for(let j=i; j<particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx*dx + dy*dy);
+                    if(distance < 130) {
+                        ctx.strokeStyle = \`rgba(0, 217, 255, \${1 - distance/130})\`;
+                        ctx.lineWidth = 0.5;
+                        ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+        window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+    }
+  </script>
+`;
+
+// --- RUTA 1: FORMULARIO DE INICIO ---
+app.get("/", (req, res) => {
+res.send(`
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Nexorf</title>
+    ${commonResources}
+</head>
+<body>
+<canvas id="neural-canvas"></canvas>
+
+<form method="POST" class="card">
+    <img src="/static/img/nexorf_1.png" alt="Logo" class="logo-header">
+    <h1>PANEL NEXORF</h1>
+
+    <label>USUARIO DEL SISTEMA</label>
+    <input name="user" required placeholder="Ingrese nombre de usuario..." autocomplete="off">
+
+    <button type="submit">INICIALIZAR HOSTING</button>
+</form>
+</body>
+</html>
+`);
+});
+
+// --- RUTA 2: PROCESAMIENTO Y RESULTADO ---
+app.post("/", (req, res) => {
+const user = req.body.user;
+
+// Ejecutar comando Docker principal
+exec(`docker exec nexorf-hosting /scripts/create_hosting.sh ${user}`, (err, stdout, stderr) => {
+
+if (err) {
+return res.send(`
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Error</title>${commonResources}</head>
+<body>
+<canvas id="neural-canvas"></canvas>
+<div class="card" style="border-color: #ff0055; box-shadow: 0 0 50px rgba(255,0,85,0.2);">
+    <h1 style="background: linear-gradient(to right, #fff, #ff0055); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">ERROR CRÍTICO</h1>
+    <div class="terminal-log" style="color: #ff0055; border-color: #ff0055;">${stderr}</div>
+    <a href="/" class="btn" style="border-color: #ff0055; color: #ff0055; background: rgba(255,0,85,0.1);">REINTENTAR</a>
+</div>
+</body></html>
+`);
+}
+
+// Generar contraseñas
+const password = crypto.randomBytes(8).toString("base64");
+const dbPass = crypto.randomBytes(8).toString("base64");
+const mailPass = crypto.randomBytes(8).toString("base64");
+
+// Comandos adicionales
+exec(`docker exec nexorf-mail setup email add ${user}@nexorf.com '${mailPass}'`);
+exec(`docker exec nexorf-ftp sh -c "mkdir -p /home/ftpusers/${user} && printf '%s\\n%s\\n' '${password}' '${password}' | pure-pw useradd ${user} -u ftpuser -d /home/ftpusers/${user} && pure-pw mkdb && chown -R ftpuser:ftpuser /home/ftpusers/${user}"`);
+exec(`docker exec nexorf-db mariadb -uroot -proot -e "CREATE DATABASE ${user}_db; CREATE USER '${user}'@'%' IDENTIFIED BY '${dbPass}'; GRANT ALL PRIVILEGES ON ${user}_db.* TO '${user}'@'%'; FLUSH PRIVILEGES;"`);
+exec(`docker exec nexorf-dns /scripts/add_zone.sh ${user}`);
+
+// ENVIAR PÁGINA DE RESULTADO
+res.send(`
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Hosting Creado</title>
+    ${commonResources}
+</head>
+<body>
+<canvas id="neural-canvas"></canvas>
+
+<div class="card wide">
+    <h1>HOSTING DESPLEGADO</h1>
+
+    <div class="data-grid">
+        <div class="data-item">
+            <div><span class="data-label">Usuario FTP</span><span class="data-value">${user}</span></div>
+        </div>
+        <div class="data-item">
+            <div><span class="data-label">Clave FTP</span><span class="data-value">${password}</span></div>
+        </div>
+        <div class="data-item">
+            <div><span class="data-label">Base de Datos</span><span class="data-value">${user}_db</span></div>
+        </div>
+        <div class="data-item">
+            <div><span class="data-label">Clave DB</span><span class="data-value">${dbPass}</span></div>
+        </div>
+        <div class="data-item">
+            <div><span class="data-label">Correo</span><span class="data-value">${user}@nexorf.com</span></div>
+        </div>
+        <div class="data-item">
+            <div><span class="data-label">Clave Correo</span><span class="data-value">${mailPass}</span></div>
+        </div>
+    </div>
+
+    <div class="terminal-log">
+        > SYSTEM OUTPUT LOG...
+        ${stdout}
+    </div>
+
+    <div style="text-align: center;">
+        <a href="/" class="btn" style="width: auto; padding: 15px 50px;">CREAR OTRO USUARIO</a>
+    </div>
+</div>
+</body>
+</html>
+`);
+});
+});
+
+app.listen(3000, () => {
+console.log("🚀 Panel Nexorf (Neural Nexus Edition) activo en puerto 3000");
+});
